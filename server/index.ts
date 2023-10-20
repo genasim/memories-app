@@ -7,8 +7,8 @@ console.log('Starting Express server ...');
 
 const app = express()
 
-configureMiddleware(app)
 configureRoutes(app)
+configureMiddleware(app)
 
 app.listen(port, () => {
     console.log(`\n================ \nServer running on port ${port} \n================ \n`)
