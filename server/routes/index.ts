@@ -1,8 +1,8 @@
-import postsRouter from './posts'
-import { Express } from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors'
-import mongoose from "mongoose"
+import cors from 'cors';
+import { Express } from 'express';
+import mongoose from "mongoose";
+import postsRouter from './posts';
 
 export const configureRoutes = (app: Express) => {
     app.use('/posts', postsRouter)

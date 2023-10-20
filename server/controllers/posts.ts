@@ -8,10 +8,6 @@ const getPosts = async (req: Request, res: Response) => {
     try {
         const postMessages = await PostMessage.find({})
 
-        if (postMessages.length === 0) {
-            res.status(404).json({ message: "Could not find any posts" })
-        }
-
         res.status(200).json({ posts: postMessages })
     } catch (error: any) {
         console.error(error.message);
@@ -21,7 +17,7 @@ const getPosts = async (req: Request, res: Response) => {
 
 const createPost = async (req: Request, res: Response) => {
     await connectMongo()
-    
+
     try {
         const createdMessage = await PostMessage.create(req.body)
         
