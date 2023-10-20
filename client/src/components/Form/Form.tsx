@@ -1,8 +1,10 @@
-import { Button, Paper, TextField, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { useState } from 'react';
-import FileBase from 'react-file-base64';
-import { PostMessage } from '../../common/types/postMessage';
+import { Button, Paper, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { PostMessage } from "../../common/types/postMessage";
+import { useCreatePostMutation } from "../../redux/features/api";
+import InputField from "./InputField";
+
 
 const initialPostState: PostMessage = {
     creator: "",
@@ -10,87 +12,86 @@ const initialPostState: PostMessage = {
     title: ""
 }
 
-interface InputFieldProps {
-    property: keyof PostMessage
-    label: string
-}
-
 const Form = () => {
     const classes = createStyles()
-    const [postData, setPostData] = useState<PostMessage>(initialPostState)
+    const [createPost, { }] = useCreatePostMutation()
 
-    const handleSubmit = (event: any) => {
-        event.preventDefault()
-
-        console.log(event);
+    const methods = useForm({
+        defaultValues: initialPostState
+    })
+    const onSubmit: SubmitHandler<PostMessage> = (formData) => {
+        createPost(formData)
     }
 
-    const onClear = () => setPostData(initialPostState)
+    const onClear = () => methods.reset()
 
-    const onPostChange = (prop: keyof PostMessage) => (event: any) => {
-        setPostData({ ...postData, [prop]: event.target.value })
+    const handleImageUpload = (event: any) => {
+        const file = event.target?.files[0]
+        if (!file)
+            return
+
+        const reader = new FileReader()
+        reader.onload = (event) => {
+            const base64Image = event.target!.result as string
+            methods.setValue('selectedFile', base64Image, { shouldDirty: true })
+        }
+        reader.readAsDataURL(file)
     }
-
-    const InputField = (props: InputFieldProps) => (
-        <TextField
-            name={props.property}
-            variant='outlined'
-            label={props.label}
-            fullWidth
-            value={postData[props.property] ?? ""}
-            onChange={onPostChange(props.property)} />
-    )
 
     return (
         <Paper className={classes.paper}>
-            <form
-                autoComplete='off'
-                noValidate
-                className={`${classes.root} ${classes.form}`}
-                onSubmit={handleSubmit}>
-                <Typography variant='h6'>Creating Memory</Typography>
+            <FormProvider {...methods}>
+                <form
+                    autoComplete="off"
+                    noValidate
+                    className={`${classes.root} ${classes.form}`}
+                    onSubmit={methods.handleSubmit(onSubmit)}>
+                    <Typography variant="h6">Creating Memory</Typography>
 
-                <InputField label='Creator' property='creator' />
-                <InputField label='Title' property='title' />
-                <InputField label='Message' property='message' />
-                <InputField label='Tags' property='tags' />
+                    <InputField label="Creator" property="creator" />
+                    <InputField label="Title" property="title" />
+                    <InputField label="Message" property="message" />
+                    <InputField label="Tags" property="tags" />
 
-                <div className={classes.fileInput}>
-                    <FileBase
-                        type='file'
-                        multiple={false}
-                        onDone={({ base64 }: any) => setPostData({ ...postData, selectedFile: base64 })}
-                    />
-                </div>
+                    <div className={classes.fileInput}>
+                        <input
+                            {...methods.register('selectedFile')}
+                            type="file"
+                            name="image"
+                            onChange={handleImageUpload}
+                        />
+                    </div>
 
-                <Button
-                    className={classes.buttonSubmit}
-                    variant='contained'
-                    color='primary'
-                    size='large'
-                    type='submit'
-                    fullWidth>
-                    Submit
-                </Button>
-                <Button
-                    variant='contained'
-                    color='secondary'
-                    size='large'
-                    type='button'
-                    fullWidth
-                    onClick={onClear}>
-                    Clear
-                </Button>
-            </form>
+                    <Button
+                        className={classes.buttonSubmit}
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        type="submit"
+                        fullWidth>
+                        Submit
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        size="large"
+                        type="button"
+                        fullWidth
+                        onClick={onClear}>
+                        Clear
+                    </Button>
+                </form>
+            </FormProvider>
         </Paper>
     )
 }
 
 export default Form
 
+
 const createStyles = makeStyles((theme) => ({
     root: {
-        '& .MuiTextField-root': {
+        "& .MuiTextField-root": {
             margin: theme.spacing(1),
         },
     },
@@ -98,14 +99,14 @@ const createStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
     },
     form: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        position: 'sticky'
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        position: "sticky"
     },
     fileInput: {
-        width: '97%',
-        margin: '10px 0',
+        width: "97%",
+        margin: "10px 0",
     },
     buttonSubmit: {
         marginBottom: 10,
