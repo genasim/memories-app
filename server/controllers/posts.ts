@@ -8,10 +8,10 @@ const getPosts = async (req: Request, res: Response) => {
     try {
         const postMessages = await PostMessage.find({})
 
-        res.status(200).json({ posts: postMessages })
+        res.status(200).send(postMessages)
     } catch (error: any) {
         console.error(error.message);
-        res.status(500).json({})
+        res.status(500).send({})
     }
 }
 
@@ -21,10 +21,10 @@ const createPost = async (req: Request, res: Response) => {
     try {
         const createdMessage = await PostMessage.create(req.body)
         
-        res.status(201).json({ message: "Post created", post: createdMessage })
+        res.status(201).send({ message: "Post created", post: createdMessage })
     } catch (error: any) {
         console.error(error.message);
-        res.status(500).json({})
+        res.status(500).send({})
     }
 }
 
