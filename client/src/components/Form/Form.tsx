@@ -1,15 +1,16 @@
 import { Button, Paper, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { PostMessage } from "../../common/types/postMessage";
 import { useCreatePostMutation } from "../../redux/features/api";
 import InputField from "./InputField";
 
 
-const initialPostState: PostMessage = {
+const initialPostState = {
     creator: "",
     message: "",
-    title: ""
+    title: "",
+    tags: "",
+    selectedFile: ""
 }
 
 const Form = () => {
@@ -19,8 +20,11 @@ const Form = () => {
     const methods = useForm({
         defaultValues: initialPostState
     })
-    const onSubmit: SubmitHandler<PostMessage> = (formData) => {
-        createPost(formData)
+    const onSubmit: SubmitHandler<typeof initialPostState> = (formData) => {
+        const tags = formData.tags
+            .replace(/\s/g, "")  // Remove all whitespaces from string
+            .split(",")
+        createPost({...formData, tags})
     }
 
     const onClear = () => methods.reset()
