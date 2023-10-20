@@ -1,6 +1,11 @@
 import { makeStyles } from '@material-ui/core/styles';
+import { PostMessage } from '../../../common/types/postMessage';
 
-const Post = () => {
+interface PostProps {
+    post: PostMessage
+}
+
+const Post = (props: PostProps) => {
     const classes = createStyles()
 
     return (
